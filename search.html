@@ -1,0 +1,309 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./images/aylet.ico">
+    <title>לב הכין את זה</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+
+        .code-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .editor {
+            background: #1e1e1e;
+            padding: 20px;
+            min-height: 300px;
+            position: relative;
+        }
+
+        #codeEditor {
+            width: 100%;
+            height: 200px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            background: transparent;
+            border: none;
+            resize: vertical;
+            padding: 10px;
+            padding-left: 45px;
+            tab-size: 4;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+        }
+
+        .button-container {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .header {
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .results {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 20px;
+            padding: 10px 5px;
+            color: #666;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: right;
+            user-select: none;
+            background: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="code-panel">
+            <div class="header">
+                <h2 dir="rtl">מציאת ערך בעץ בינארי</h2>
+                <p dir="rtl">כתוב פונקציה שמחזירה true אם קיים ערך בעץ הבינארי, false אחרת.</p>
+            </div>
+            <div class="editor">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <textarea id="codeEditor" spellcheck="false">public class Solution {
+    public static boolean hasValue(BinNode root, int target) {
+        // Your code here
+    }
+}</textarea>
+            </div>
+            <div class="button-container">
+                <button onclick="runTests()">הרץ טסטים</button>
+                <button onclick="showSolution()" style="background: #0d6efd;">הצגת פתרון</button>
+            </div>
+        </div>
+        <div class="results" id="results">
+            <h3 dir="rtl">תוצאות הטסטים:</h3>
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('codeEditor');
+        const lineNumbers = document.getElementById('lineNumbers');
+
+        function updateLineNumbers() {
+            const lines = editor.value.split('\n').length;
+            lineNumbers.innerHTML = Array(lines)
+                .fill()
+                .map((_, i) => `<div>${i + 1}</div>`)
+                .join('');
+        }
+
+        editor.addEventListener('input', updateLineNumbers);
+        editor.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = editor.scrollTop;
+        });
+
+        editor.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const spaces = '    ';
+                this.value = this.value.substring(0, start) + spaces + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + spaces.length;
+                updateLineNumbers();
+            } else if (e.key === 'Backspace') {
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+
+                // Only handle backspace if there's no selection (start === end)
+                if (start === end) {
+                    // Get the 4 characters before the cursor
+                    const beforeCursor = this.value.substring(start - 4, start);
+                    // Check if they're all spaces
+                    if (beforeCursor === '    ') {
+                        e.preventDefault();
+                        // Remove all 4 spaces at once
+                        this.value = this.value.substring(0, start - 4) + this.value.substring(end);
+                        this.selectionStart = this.selectionEnd = start - 4;
+                        updateLineNumbers();
+                    }
+                }
+            }
+        });
+
+        class BinNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+            getValue() {
+                return this.value;
+            }
+            getLeft() {
+                return this.left;
+            }
+            getRight() {
+                return this.right;
+            }
+            setLeft(node) {
+                this.left = node;
+                return this;
+            }
+            setRight(node) {
+                this.right = node;
+                return this;
+            }
+            hasLeft() {
+                return this.left !== null;
+            }
+            hasRight() {
+                return this.right !== null;
+            }
+        }
+
+        function evaluateUserCode(code, root, target) {
+            const methodBodyMatch = code.match(/hasValue\s*\([^)]*\)\s*{([\s\S]*?)}(?=\s*})/);
+            let methodBody = methodBodyMatch[1].trim();
+
+            const wrappedCode = `
+                    function hasValue(root, target) {
+                        ${methodBody}
+                    }
+                    return hasValue(root, target);
+                `;
+            return new Function('root', 'target', wrappedCode)(root, target);
+        }
+
+        const testCases = [
+            {
+                name: "Single Node (Found)",
+                tree: new BinNode(5),
+                target: 5,
+                expected: true
+            },
+            {
+                name: "Single Node (Not Found)",
+                tree: new BinNode(5),
+                target: 3,
+                expected: false
+            },
+            {
+                name: "Simple Tree (Found)",
+                tree: (() => {
+                    const root = new BinNode(1);
+                    root.setLeft(new BinNode(3));
+                    root.setRight(new BinNode(2));
+                    return root;
+                })(),
+                target: 3,
+                expected: true
+            },
+            {
+                name: "Simple Tree (Not Found)",
+                tree: (() => {
+                    const root = new BinNode(1);
+                    root.setLeft(new BinNode(3));
+                    root.setRight(new BinNode(2));
+                    return root;
+                })(),
+                target: 4,
+                expected: false
+            },
+            {
+                name: "Empty Tree",
+                tree: null,
+                target: 1,
+                expected: false
+            }
+        ];
+
+        function runTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3 dir="rtl">תוצאות הטסטים:</h3>';
+
+            const code = document.getElementById('codeEditor').value;
+            let passed = 0;
+
+            testCases.forEach(test => {
+                try {
+                    const result = evaluateUserCode(code, test.tree, test.target);
+                    const success = result === test.expected;
+
+                    const testDiv = document.createElement('div');
+                    testDiv.style.padding = '10px';
+                    testDiv.style.margin = '5px 0';
+                    testDiv.style.borderRadius = '4px';
+                    testDiv.style.backgroundColor = success ? '#d4edda' : '#f8d7da';
+                    testDiv.style.color = success ? '#155724' : '#721c24';
+                    testDiv.textContent = `${test.name}: ${success ? 'PASSED' : 'FAILED'} (Expected ${test.expected}, got ${result})`;
+                    resultsDiv.appendChild(testDiv);
+
+                    if (success) passed++;
+                } catch (e) {
+                    const testDiv = document.createElement('div');
+                    testDiv.style.padding = '10px';
+                    testDiv.style.margin = '5px 0';
+                    testDiv.style.backgroundColor = '#f8d7da';
+                    testDiv.style.color = '#721c24';
+                    testDiv.textContent = `${test.name}: Error - ${e.message}`;
+                    resultsDiv.appendChild(testDiv);
+                }
+            });
+
+            const summary = document.createElement('div');
+            summary.style.marginTop = '20px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `Passed ${passed} out of ${testCases.length} tests`;
+            resultsDiv.appendChild(summary);
+        }
+
+        function showSolution() {
+            const solution = `
+        public static boolean hasValue(BinNode root, int target) {
+            if (root == null) return false;
+            if (root.getValue() == target) return true;
+            return hasValue(root.getLeft(), target) || hasValue(root.getRight(), target);
+        }`;
+
+            document.getElementById('codeEditor').value = `public class Solution {${solution}}`;
+            updateLineNumbers();
+        }
+
+        updateLineNumbers();
+    </script>
+</body>
+</html>

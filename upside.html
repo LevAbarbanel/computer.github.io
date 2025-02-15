@@ -1,0 +1,399 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./images/aylet.ico">
+    <title>לב הכין את זה</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+
+        .code-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .editor {
+            background: #1e1e1e;
+            padding: 20px;
+            min-height: 300px;
+            position: relative;
+        }
+
+        #codeEditor {
+            width: 100%;
+            height: 200px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            background: transparent;
+            border: none;
+            resize: vertical;
+            padding: 10px;
+            tab-size: 4;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .results {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .compilation-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .test-case {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 20px;
+            padding: 10px 5px;
+            color: #666;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: right;
+            user-select: none;
+            background: #1e1e1e;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span class="back-arrow"></span>
+        הביתה
+    </a>
+    <div class="container">
+        <div class="code-panel">
+            <div class="header">
+                <h2 dir="rtl">תרגול למבחן במבנה נתונים</h2>
+                <p dir="rtl">כתוב פונקציה המחברת את כל המחרוזות בעץ באופן תוכי (שמאל-שורש-ימין). אם העץ ריק, החזר מחרוזת ריקה.</p>
+            </div>
+            <div class="editor">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <textarea id="codeEditor" spellcheck="false">public class Solution {
+    public static String concatInorder(BinNode root) {
+        
+    }
+}</textarea>
+            </div>
+            <div class="button-container">
+                <button onclick="runTests()">הרץ טסטים</button>
+                <button onclick="showSolution()" style="background: #0d6efd;">הצגת פתרון</button>
+            </div>
+            <div id="compilationOutput" class="compilation-output"></div>
+        </div>
+        <div class="results" id="results">
+            <h3 dir="rtl">תוצאות הטסטים:</h3>
+        </div>
+    </div>
+
+    <script>
+        class BinNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+            getValue() {
+                return this.value;
+            }
+            getLeft() {
+                return this.left;
+            }
+            getRight() {
+                return this.right;
+            }
+            setLeft(node) {
+                this.left = node;
+                return this;
+            }
+            setRight(node) {
+                this.right = node;
+                return this;
+            }
+            hasLeft() {
+                return this.left !== null;
+            }
+            hasRight() {
+                return this.right !== null;
+            }
+        }
+
+        const editor = document.getElementById('codeEditor');
+        const lineNumbers = document.getElementById('lineNumbers');
+
+        function updateLineNumbers() {
+            const lines = editor.value.split('\n').length;
+            lineNumbers.innerHTML = Array(lines)
+                .fill()
+                .map((_, i) => `<div>${i + 1}</div>`)
+                .join('');
+        }
+
+        editor.addEventListener('input', updateLineNumbers);
+        editor.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = editor.scrollTop;
+        });
+
+        editor.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const spaces = '    ';
+                this.value = this.value.substring(0, start) + spaces + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + spaces.length;
+                updateLineNumbers();
+            }
+        });
+
+        function compile() {
+            const code = editor.value;
+            const compilationOutput = document.getElementById('compilationOutput');
+
+            try {
+                const methodBodyMatch = code.match(/concatInorder\s*\([^)]*\)\s*{([\s\S]*?)}(?=\s*})/);
+                if (!methodBodyMatch) {
+                    throw new Error('Could not extract method body');
+                }
+
+                let methodBody = methodBodyMatch[1].trim();
+                methodBody = methodBody.replace(/BinNode\s*<\s*[^>]+\s*>\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $1 = $2;');
+                methodBody = methodBody.replace(/\b(String|int|BinNode)\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $2 = $3;');
+                methodBody = methodBody.replace(/\b(String|int|BinNode)\s+(\w+)\s*;/g, 'let $2;');
+
+                const jsCode = `
+                        function concatInorder(root) {
+                            ${methodBody}
+                        }
+                    `;
+
+                new Function('root', jsCode);
+                compilationOutput.textContent = 'Compilation successful!';
+                compilationOutput.className = 'compilation-output success';
+                return true;
+            } catch (error) {
+                compilationOutput.textContent = `Compilation failed:\n${error.message}`;
+                compilationOutput.className = 'compilation-output error';
+                return false;
+            }
+        }
+
+        function evaluateUserCode(code, root) {
+            const methodBodyMatch = code.match(/concatInorder\s*\([^)]*\)\s*{([\s\S]*?)}(?=\s*})/);
+            let methodBody = methodBodyMatch[1].trim();
+            methodBody = methodBody.replace(/BinNode\s*<\s*[^>]+\s*>\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $1 = $2;');
+            methodBody = methodBody.replace(/\b(String|int|BinNode)\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $2 = $3;');
+            methodBody = methodBody.replace(/\b(String|int|BinNode)\s+(\w+)\s*;/g, 'let $2;');
+
+            const wrappedCode = `
+                    function concatInorder(root) {
+                        ${methodBody}
+                        return ""; // Default return if none provided
+                    }
+                    return concatInorder(root);
+                `;
+
+            return new Function('root', wrappedCode)(root);
+        }
+
+        const testCases = [
+            {
+                name: "Empty Tree",
+                tree: null,
+                expected: ""
+            },
+            {
+                name: "Single Node",
+                tree: new BinNode("hello"),
+                expected: "hello"
+            },
+            {
+                name: "Simple Tree",
+                tree: (() => {
+                    const root = new BinNode("root");
+                    root.setLeft(new BinNode("left"));
+                    root.setRight(new BinNode("right"));
+                    return root;
+                })(),
+                expected: "leftrootright"
+            },
+            {
+                name: "Complex Tree",
+                tree: (() => {
+                    const root = new BinNode("middle");
+                    root.setLeft(new BinNode("start"));
+                    root.setRight(new BinNode("end"));
+                    root.getLeft().setLeft(new BinNode("first"));
+                    root.getRight().setRight(new BinNode("last"));
+                    return root;
+                })(),
+                expected: "firststartmiddleendlast"
+            },
+            {
+                name: "Left-Heavy Tree",
+                tree: (() => {
+                    const root = new BinNode("3");
+                    root.setLeft(new BinNode("2"));
+                    root.getLeft().setLeft(new BinNode("1"));
+                    return root;
+                })(),
+                expected: "123"
+            },
+            {
+                name: "Right-Heavy Tree",
+                tree: (() => {
+                    const root = new BinNode("A");
+                    root.setRight(new BinNode("B"));
+                    root.getRight().setRight(new BinNode("C"));
+                    return root;
+                })(),
+                expected: "ABC"
+            },
+            {
+                name: "Mixed Content Tree",
+                tree: (() => {
+                    const root = new BinNode("root");
+                    root.setLeft(new BinNode("123"));
+                    root.setRight(new BinNode("abc"));
+                    return root;
+                })(),
+                expected: "123rootabc"
+            }
+        ];
+
+        function runTests() {
+            if (!compile()) {
+                return;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3 dir="rtl">תוצאות הטסטים:</h3>';
+
+            const code = editor.value;
+            let passed = 0;
+
+            testCases.forEach(test => {
+                try {
+                    const result = evaluateUserCode(code, test.tree);
+                    const success = result === test.expected;
+
+                    const testDiv = document.createElement('div');
+                    testDiv.className = `test-case ${success ? 'success' : 'error'}`;
+                    testDiv.textContent = `${test.name}: ${success ? 'PASSED' : 'FAILED'} (Expected "${test.expected}", got "${result}")`;
+                    resultsDiv.appendChild(testDiv);
+
+                    if (success) passed++;
+                } catch (e) {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'test-case error';
+                    testDiv.textContent = `${test.name}: Error - ${e.message}`;
+                    resultsDiv.appendChild(testDiv);
+                }
+            });
+
+            const summary = document.createElement('div');
+            summary.style.marginTop = '20px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `Passed ${passed} out of ${testCases.length} tests`;
+            resultsDiv.appendChild(summary);
+        }
+
+        function showSolution() {
+            const solution = `
+        public static String concatInorder(BinNode root) {
+            if (root == null) {
+                return "";
+            }
+            return concatInorder(root.getLeft()) + root.getValue() + concatInorder(root.getRight());
+        }`;
+
+            editor.value = `public class Solution {${solution}}`;
+            updateLineNumbers();
+        }
+
+        updateLineNumbers();
+    </script>
+</body>
+</html>

@@ -1,0 +1,520 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./images/aylet.ico">
+    <title>לב הכין את זה</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+
+        .code-panel {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .editor {
+            background: #1e1e1e;
+            padding: 20px;
+            min-height: 300px;
+            position: relative;
+        }
+
+        #codeEditor {
+            width: 100%;
+            height: 200px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            background: transparent;
+            border: none;
+            resize: vertical;
+            padding: 10px;
+            tab-size: 4;
+            -moz-tab-size: 4;
+            white-space: pre;
+            overflow-wrap: normal;
+            overflow-x: auto;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .results {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .compilation-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .test-case {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .header {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 20px;
+            padding: 10px 5px;
+            color: #666;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: right;
+            user-select: none;
+            background: #1e1e1e;
+        }
+        /* New back button styles */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+            .back-button:hover {
+                background: #0b5ed7;
+            }
+
+        /* Arrow icon for back button */
+        .back-arrow {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-right: 4px;
+        }
+
+        /* Adjust container to accommodate back button */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">
+        <span class="back-arrow"></span>
+        הביתה
+    </a>
+    <div class="container">
+        <div class="code-panel">
+            <div class="header">
+                <h2 dir="rtl">תרגול למבחן במבנה נתונים</h2>
+                <p dir="rtl">כתוב קוד הסופר את מספר העלים בעץ:</p>
+            </div>
+            <div class="editor">
+                <div class="line-numbers" id="lineNumbers"></div>
+                <textarea id="codeEditor" spellcheck="false">public class Solution {
+    public static int countLeaves(BinNode root) {
+        
+       
+    }
+}</textarea>
+
+            </div>
+            <div class="button-container">
+                <button onclick="runTests()">הרץ טסטים</button>
+                <button onclick="showSolution()" style="background: #0d6efd;">הצגת פתרון</button>
+
+
+            </div>
+
+            <div id="compilationOutput" class="compilation-output"></div>
+        </div>
+        <div class="results" id="results">
+            <h3 dir="rtl">תוצאות הטסטים:</h3>
+        </div>
+    </div>
+
+    <script>
+        // BinNode class definition with more flexible value handling
+        class BinNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+            getValue() {
+                return this.value;
+            }
+            getLeft() {
+                return this.left;
+            }
+            getRight() {
+                return this.right;
+            }
+            setLeft(node) {
+                this.left = node;
+                return this; // Allow method chaining
+            }
+            setRight(node) {
+                this.right = node;
+                return this; // Allow method chaining
+            }
+            hasLeft() {
+                return this.left !== null;
+            }
+            hasRight() {
+                return this.right !== null;
+            }
+        }
+
+        // Enhanced editor functionality
+        const editor = document.getElementById('codeEditor');
+        const lineNumbers = document.getElementById('lineNumbers');
+
+        function updateLineNumbers() {
+            const lines = editor.value.split('\n').length;
+            lineNumbers.innerHTML = Array(lines)
+                .fill()
+                .map((_, i) => `<div>${i + 1}</div>`)
+                .join('');
+        }
+
+        editor.addEventListener('input', updateLineNumbers);
+        editor.addEventListener('scroll', () => {
+            lineNumbers.scrollTop = editor.scrollTop;
+        });
+
+        editor.addEventListener('keydown', function (e) {
+            // Handle Backspace key for tab deletion
+            if (e.key === 'Backspace') {
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+
+                // Only process if no text is selected and we're not at the start
+                if (start === end && start > 0) {
+                    // Get the text before the cursor
+                    const beforeCursor = this.value.substring(0, start);
+                    // Check if the previous 4 characters are spaces
+                    const lastFourChars = beforeCursor.slice(-4);
+                    if (lastFourChars.match(/^ {4}$/)) {
+                        e.preventDefault();
+                        // Remove all 4 spaces at once
+                        this.value = beforeCursor.slice(0, -4) + this.value.substring(end);
+                        // Move cursor to new position
+                        this.selectionStart = this.selectionEnd = start - 4;
+                        updateLineNumbers();
+                    }
+                }
+            }
+
+            // Handle Tab key
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const spaces = '    ';
+
+                // If text is selected, indent the entire selection
+                if (start !== end) {
+                    const selectedText = this.value.substring(start, end);
+                    const indentedText = selectedText.split('\n').map(line => spaces + line).join('\n');
+                    this.value = this.value.substring(0, start) + indentedText + this.value.substring(end);
+                    this.selectionStart = start;
+                    this.selectionEnd = start + indentedText.length;
+                } else {
+                    // If no text selected, just insert spaces
+                    this.value = this.value.substring(0, start) + spaces + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + spaces.length;
+                }
+                updateLineNumbers();
+            }
+        });
+
+        // Java Compiler implementation
+        function compile() {
+            const code = editor.value;
+            const compilationOutput = document.getElementById('compilationOutput');
+
+            try {
+                const methodBodyMatch = code.match(/countLeaves\s*\([^)]*\)\s*{([\s\S]*?)}(?=\s*})/);
+                if (!methodBodyMatch) {
+                    throw new Error('Could not extract method body');
+                }
+
+                let methodBody = methodBodyMatch[1].trim();
+
+                // Handle generic type declarations first
+                methodBody = methodBody.replace(/BinNode\s*<\s*[^>]+\s*>\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $1 = $2;');
+
+                // Handle other Java type declarations
+                methodBody = methodBody.replace(/\b(BinNode<[^>]+>|BinNode|int|double|long|float|boolean)\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $2 = $3;');
+                methodBody = methodBody.replace(/\b(BinNode<[^>]+>|BinNode|int|double|long|float|boolean)\s+(\w+)\s*;/g, 'let $2;');
+
+                const jsCode = `
+                function countLeaves(root) {
+                    ${methodBody}
+                }
+                `;
+
+                // Validate syntax by creating a function
+                new Function('root', jsCode);
+
+                compilationOutput.textContent = 'Compilation successful!';
+                compilationOutput.className = 'compilation-output success';
+
+                return true;
+            } catch (error) {
+                compilationOutput.textContent = `Compilation failed:\n${error.message}`;
+                compilationOutput.className = 'compilation-output error';
+
+                return false;
+            }
+        }
+
+        function evaluateUserCode(code, root) {
+            const methodBodyMatch = code.match(/countLeaves\s*\([^)]*\)\s*{([\s\S]*?)}(?=\s*})/);
+            let methodBody = methodBodyMatch[1].trim();
+
+            // Handle generic type declarations first
+            methodBody = methodBody.replace(/BinNode\s*<\s*[^>]+\s*>\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $1 = $2;');
+
+            // Handle other Java type declarations
+            methodBody = methodBody.replace(/\b(BinNode<[^>]+>|BinNode|int|double|long|float|boolean)\s+(\w+)\s*=\s*([^;]+)\s*;/g, 'const $2 = $3;');
+            methodBody = methodBody.replace(/\b(BinNode<[^>]+>|BinNode|int|double|long|float|boolean)\s+(\w+)\s*;/g, 'let $2;');
+
+            const wrappedCode = `
+                function countLeaves(root) {
+                    ${methodBody}
+                    return 0; // Default return if none provided
+                }
+                return countLeaves(root);
+            `;
+
+            return new Function('root', wrappedCode)(root);
+        }
+
+        const testCases = [
+            {
+                name: "Integer Tree (1,2,3)",
+                tree: (() => {
+                    const root = new BinNode(1);
+                    root.setLeft(new BinNode(2));
+                    root.setRight(new BinNode(3));
+                    return root;
+                })(),
+                expected: 2
+            },
+            {
+                name: "Double Tree",
+                tree: (() => {
+                    const root = new BinNode(5.5);
+                    root.setLeft(new BinNode(3.3));
+                    root.setRight(new BinNode(7.7));
+                    root.getLeft().setLeft(new BinNode(1.1));
+                    root.getRight().setRight(new BinNode(9.9));
+                    return root;
+                })(),
+                expected: 2
+            },
+            {
+                name: "String Tree",
+                tree: (() => {
+                    const root = new BinNode("root");
+                    root.setLeft(new BinNode("left"));
+                    root.setRight(new BinNode("right"));
+                    root.getLeft().setLeft(new BinNode("leaf1"));
+                    root.getRight().setRight(new BinNode("leaf2"));
+                    return root;
+                })(),
+                expected: 2
+            },
+            {
+                name: "Single Node Integer",
+                tree: new BinNode(42),
+                expected: 1
+            },
+            {
+                name: "Single Node Double",
+                tree: new BinNode(3.14),
+                expected: 1
+            },
+            {
+                name: "Single Node String",
+                tree: new BinNode("hello"),
+                expected: 1
+            },
+            {
+                name: "Empty Tree",
+                tree: null,
+                expected: 0
+            },
+            {
+                name: "Deep Left-Skewed Integer Tree",
+                tree: (() => {
+                    const root = new BinNode(10);
+                    let current = root;
+                    for (let i = 9; i > 0; i--) {
+                        current.setLeft(new BinNode(i));
+                        current = current.getLeft();
+                    }
+                    return root;
+                })(),
+                expected: 1
+            },
+            {
+                name: "Deep Right-Skewed Double Tree",
+                tree: (() => {
+                    const root = new BinNode(1.0);
+                    let current = root;
+                    for (let i = 2; i <= 10; i++) {
+                        current.setRight(new BinNode(i * 0.5));
+                        current = current.getRight();
+                    }
+                    return root;
+                })(),
+                expected: 1
+            },
+            {
+                name: "Complex Multi-Level Mixed Tree",
+                tree: (() => {
+                    const root = new BinNode(-5);
+                    root.setLeft(new BinNode("left"))
+                        .setRight(new BinNode(7.7));
+                    root.getLeft().setLeft(new BinNode(-1));
+                    root.getLeft().getLeft().setLeft(new BinNode("deep leaf"));
+                    root.getRight().setRight(new BinNode(9));
+                    return root;
+                })(),
+                expected: 2
+            }
+        ];
+
+        function runTests() {
+            // First compile the code
+            if (!compile()) {
+                return;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h3 dir="rtl">תוצאות הטסטים:</h3>';
+
+            const code = editor.value;
+            let passed = 0;
+
+            testCases.forEach(test => {
+                try {
+                    const result = evaluateUserCode(code, test.tree);
+                    const success = result === test.expected;
+
+                    const testDiv = document.createElement('div');
+                    testDiv.className = `test-case ${success ? 'success' : 'error'}`;
+                    testDiv.textContent = `${test.name}: ${success ? 'PASSED' : 'FAILED'} (Expected ${test.expected}, got ${result})`;
+                    resultsDiv.appendChild(testDiv);
+
+                    if (success) passed++;
+                } catch (e) {
+                    const testDiv = document.createElement('div');
+                    testDiv.className = 'test-case error';
+                    testDiv.textContent = `${test.name}: Error - ${e.message}`;
+                    resultsDiv.appendChild(testDiv);
+                }
+            });
+
+            const summary = document.createElement('div');
+            summary.style.marginTop = '20px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `Passed ${passed} out of ${testCases.length} tests`;
+            resultsDiv.appendChild(summary);
+        }
+
+        // Initialize line numbers
+        updateLineNumbers();
+        function showSolution() {
+            const solution =
+                 `
+    public static int countLeaves(BinNode root) {
+        if (root == null) {
+            return 0;
+        }
+        if (!root.hasLeft() && !root.hasRight()) {
+            return 1;
+        }
+        return countLeaves(root.getLeft()) + countLeaves(root.getRight());
+    }`
+
+
+            // Determine which solution to show based on the code in the editor
+            const code = editor.value;
+
+                editor.value = `public class Solution {${solution}}`;
+                updateLineNumbers();
+            }
+
+    </script>
+</body>
+</html>

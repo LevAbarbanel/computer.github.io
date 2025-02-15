@@ -1,0 +1,273 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./images/aylet.ico">
+    <title>לב הכין את זה</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            color: #0f0;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px #0f0;
+            font-family: monospace;
+        }
+
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .challenge-card {
+            background: rgba(0, 20, 0, 0.8);
+            border: 1px solid #0f0;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+            .challenge-card:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+
+            .challenge-card:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .challenge-card:nth-child(3) {
+                animation-delay: 0.3s;
+            }
+
+            .challenge-card:nth-child(4) {
+                animation-delay: 0.4s;
+            }
+
+            .challenge-card:nth-child(5) {
+                animation-delay: 0.5s;
+            }
+
+            .challenge-card:nth-child(6) {
+                animation-delay: 0.6s;
+            }
+
+            .challenge-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+                background: rgba(0, 30, 0, 0.9);
+            }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #0f0;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 10px #0f0;
+        }
+
+        .challenge-title {
+            font-size: 1.5rem;
+            color: #0f0;
+            margin-bottom: 1rem;
+            font-family: monospace;
+        }
+
+        .challenge-description {
+            color: #0f0;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        .start-button {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: rgba(0, 255, 0, 0.1);
+            color: #0f0;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid #0f0;
+            cursor: pointer;
+            font-family: monospace;
+        }
+
+            .start-button:hover {
+                background: rgba(0, 255, 0, 0.2);
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+                transform: scale(1.05);
+            }
+
+        @media (max-width: 768px) {
+            .challenges-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body dir="rtl">
+    <canvas id="matrix-bg"></canvas>
+    <div class="container">
+        <h1>תרגול עצים בינאריים</h1>
+        <div class="challenges-grid">
+            <div class="challenge-card">
+                <i class="icon fas fa-tree"></i>
+                <h2 class="challenge-title">ספירת עלים</h2>
+                <p class="challenge-description">התאמנו בספירת העלים בעץ בינארי. בדקו את היכולת שלכם לזהות ולספור עלים בעץ.</p>
+                <a href="leaves.html" class="start-button">התחל אתגר</a>
+            </div>
+
+            <div class="challenge-card">
+                <i class="icon fas fa-calculator"></i>
+                <h2 class="challenge-title">סכום צמתים</h2>
+                <p class="challenge-description">תרגלו חישוב סכום כל הערכים בעץ בינארי. פתחו פונקציה שמסכמת את כל הערכים.</p>
+                <a href="sum.html" class="start-button">התחל אתגר</a>
+            </div>
+
+            <div class="challenge-card">
+                <i class="icon fas fa-arrows-alt-v"></i>
+                <h2 class="challenge-title">גובה העץ</h2>
+                <p class="challenge-description">למדו לחשב את גובה העץ הבינארי. מצאו את המסלול הארוך ביותר מהשורש לעלה.</p>
+                <a href="height.html" class="start-button">התחל אתגר</a>
+            </div>
+
+            <div class="challenge-card">
+                <i class="icon fas fa-search"></i>
+                <h2 class="challenge-title">חיפוש ערך</h2>
+                <p class="challenge-description">תרגלו מציאת ערך בעץ בינארי. פתחו פונקציה שבודקת האם ערך מסוים קיים בעץ.</p>
+                <a href="search.html" class="start-button">התחל אתגר</a>
+            </div>
+
+            <div class="challenge-card">
+                <i class="icon fas fa-exchange-alt"></i>
+                <h2 class="challenge-title">החזרת ערכי העץ</h2>
+                <p class="challenge-description">תרגלו היפוך של עץ בינארי. למדו כיצד להחזיר את ערכי העץ במחרוזת אחת..</p>
+                <a href="upside.html" class="start-button">התחל אתגר</a>
+            </div>
+
+            <div class="challenge-card">
+                <i class="icon fas fa-layer-group"></i>
+                <h2 class="challenge-title">ספירת צמתים ברמה</h2>
+                <p class="challenge-description">תרגלו ספירת צמתים ברמה מסוימת בעץ בינארי. למדו לזהות ולספור צמתים לפי רמתם בעץ.</p>
+                <a href="level.html" class="start-button">התחל אתגר</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        const chars = 'nigger0123456789';
+        const charArray = chars.split('');
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = new Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+
+        document.querySelectorAll('.challenge-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.querySelector('.icon').style.transform = 'scale(1.2)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.querySelector('.icon').style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
