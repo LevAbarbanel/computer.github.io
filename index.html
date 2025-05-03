@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -112,6 +112,10 @@
             .challenge-card:nth-child(6) {
                 animation-delay: 0.6s;
             }
+            
+            .challenge-card:nth-child(7) {
+                animation-delay: 0.7s;
+            }
 
             .challenge-card:hover {
                 transform: translateY(-10px);
@@ -219,6 +223,13 @@
                 <p class="challenge-description">תרגלו ספירת צמתים ברמה מסוימת בעץ בינארי. למדו לזהות ולספור צמתים לפי רמתם בעץ.</p>
                 <a href="level.html" class="start-button">התחל אתגר</a>
             </div>
+            
+            <div class="challenge-card">
+                <i class="icon fas fa-route"></i>
+                <h2 class="challenge-title">סכום מסלול</h2>
+                <p class="challenge-description">בדקו אם קיים מסלול מהשורש לעלה כך שסכום הערכים במסלול שווה לערך נתון.</p>
+                <a href="pathsum.html" class="start-button">התחל אתגר</a>
+            </div>
         </div>
     </div>
 
@@ -233,7 +244,7 @@
         setCanvasSize();
         window.addEventListener('resize', setCanvasSize);
 
-        const chars = 'nigger0123456789';
+        const chars = '01234567890123456789';
         const charArray = chars.split('');
         const fontSize = 14;
         const columns = canvas.width / fontSize;
